@@ -28,8 +28,8 @@ I’m Felipe Herrera, a Ph.D. candidate in Electrical Engineering at the Univers
 
 My research is focused on advanced control techniques for power electronics, particularly Model Predictive Control (MPC) applied to Multilevel Converters. I’m passionate about bridging theoretical insights with practical implementation to improve the performance, efficiency, and reliability of modern power electronic systems.
 
-My work spans mathematical modeling, real-time control, and experimental validation. I enjoy designing and testing control algorithms on real hardware, and my expertise contributes to innovations in renewable energy systems, smart grids, and high-efficiency power conversion.
+My work spans mathematical modeling, real-time control, and experimental validation (mostly Hardware-in-the-Loop). I enjoy designing and testing control algorithms, and my expertise contributes to innovations in renewable energy systems, Low-Frequency AC transmission, and high-efficiency power conversion.
 
-Outside of research, I enjoy watching movies and series, reading, sleeping (yes, seriously), and going out for coffee. I also appreciate a good beer on the weekends 🍺.
+Outside of research, I enjoy watching movies and series, reading, and going out for coffee. I also appreciate a good beer on the weekends 🍺.
 
-If you're working on anything related to power electronics, control systems, or just want to talk over a cup of coffee (or a cold one), feel free to reach out!
+If you're working on anything related to power electronics control systems, or just want to talk over a cup of coffee (or a cold one), feel free to reach out!
