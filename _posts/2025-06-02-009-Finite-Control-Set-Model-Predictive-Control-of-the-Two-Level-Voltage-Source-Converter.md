@@ -1,6 +1,6 @@
 ---
 layout: distill
-title: blog entry title
+title: Finite Control Set Model Predictive Control of a Two Level Voltage Source Converter
 
 authors:
   - name: Felipe Herrera
