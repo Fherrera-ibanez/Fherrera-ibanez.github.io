@@ -19,6 +19,9 @@ toc:
     # subsections:
     #   - name: Example Child Subsection 1
     #   - name: Example Child Subsection 2
+  - name: Introduction
+  - Two-Level Voltage Source Converter
+
 
 
 ---
@@ -52,7 +55,11 @@ Don’t worry if this sounds abstract — this is just a high-level summary. In 
 
 The 2L-VSC is the most basic inverter topology that every power electronics student learns. It consist of three legs with two switches each. The switches have two modes of operation: the *on* state and the *off* state. During the *on* state, the switch is conducting. Meanwhile, during the *off* state, the switch is blocking. To avoid the shoot-through state (which is when the two switches of one leg are in the *on* state, short-circuiting the DC-link bus), the switches operate in a complementary manner (i.e., when one switch is in the *on* state, the other is in the *off* state). The diagram of the 2L-VSC is shown in Fig. 1.  
 
-![[2L-VSC.svg|350]]
+<div class="row justify-content-sm-center">
+  <div class="col-sm-8 mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img_bp0/2L-VSC.svg" title="Fig. 1 Diagram of the 2L-VSC" class="img-fluid rounded z-depth-1" %}
+  </div>
+</div>
 
 The mathematical model of the 2L-VSC will be posed using the formulation presented in <d-cite key="mora_computationally_2019"></d-cite>. In this post, the switch states are represented by variables $u_x$ with $x \in \{a,b,c\}$. Considering that we have two states *per leg*, and three legs, the number of possible combinations available for the 2L-VSC (given that the switches must operate in a complementary manner) are 8. This fact is important for the operation of the FCS-MPC strategy. The complete operation of the converter can be characterized by the three-phase switching vector $\boldsymbol u_{abc} = [u_a\;u_b\;u_c]^\intercal \in \mathbb U  {\triangleq} \{1,0\}^3$. The set $\mathbb U$ contain the eight combinations of the switching vector, and is defined as:
 
