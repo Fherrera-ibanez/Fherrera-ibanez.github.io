@@ -30,9 +30,9 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/projects/";
           },
-        },{id: "post-blog-entry-title",
+        },{id: "post-finite-control-set-model-predictive-control-of-a-two-level-voltage-source-converter",
         
-          title: "blog entry title",
+          title: "Finite Control Set Model Predictive Control of a Two Level Voltage Source Converter...",
         
         description: "",
         section: "Posts",
