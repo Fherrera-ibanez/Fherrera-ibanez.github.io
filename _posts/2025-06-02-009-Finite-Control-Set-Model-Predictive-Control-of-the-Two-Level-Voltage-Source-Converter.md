@@ -5,7 +5,7 @@ title: Finite Control Set Model Predictive Control of a Two Level Voltage Source
 authors:
   - name: Felipe Herrera
 
-bibliography: BP0.bib
+bibliography: 2025-02-06-BP0.bib
 
 # Optionally, you can add a table of contents to your post.
 # NOTES:
