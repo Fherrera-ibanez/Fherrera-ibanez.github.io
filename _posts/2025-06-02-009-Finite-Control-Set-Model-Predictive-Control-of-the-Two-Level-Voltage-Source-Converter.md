@@ -68,9 +68,9 @@ The 2L-VSC is the most basic inverter topology that every power electronics stud
 
 The mathematical model of the 2L-VSC will be posed using the formulation presented in <d-cite key="mora_computationally_2019"></d-cite>. In this post, the switch states are represented by variables $u_x$ with $x \in \{a,b,c\}$. Considering that we have two states *per leg*, and three legs, the number of possible combinations available for the 2L-VSC (given that the switches must operate in a complementary manner) are 8. This fact is important for the operation of the FCS-MPC strategy. The complete operation of the converter can be characterized by the three-phase switching vector $\boldsymbol u_{abc} = [u_a\;u_b\;u_c]^\intercal \in \mathbb U  {\triangleq} \{1,0\}^3$. The set $\mathbb U$ contain the eight combinations of the switching vector, and is defined as:
 
-{% raw %}
+
 $$\mathbb U \triangleq \left\{\begin{bmatrix}0\\0\\0\end{bmatrix},\begin{bmatrix}1\\0\\0\end{bmatrix},\begin{bmatrix}0\\1\\0\end{bmatrix},\begin{bmatrix}1\\1\\0\end{bmatrix},\begin{bmatrix}0\\0\\1\end{bmatrix},\begin{bmatrix}1\\0\\1\end{bmatrix},\begin{bmatrix}0\\1\\1\end{bmatrix},\begin{bmatrix}1\\1\\1\end{bmatrix}\right\}$$
-{% endraw %}
+
 
 Until now, we have just characterized the operation of the converter. However, we are interested in the converter output voltage. Consider that an ideal *dc* voltage source is connected at the *dc* side of the converter. The *ac* side output voltage is then:
 
@@ -79,7 +79,7 @@ $$\boldsymbol v_{abc} = V_{dc}\boldsymbol u_{abc}$$
 It is typical to transform this three-phase voltage into a two-phase voltage using the *Amplitude-invariant Clarke transform*. To do so we define the transformation as follows:
 
 $$
-\pmb{\mathcal{T}} = \frac{2}{3}\begin{bmatrix} 1 & {-}\frac{1}{2} & {-}\frac{1}{2}\\ 0 & \frac{\sqrt{3}}{2} & \frac{{-}\sqrt{3}}{2} \end{bmatrix}
+\pmb{\mathcal{T}} = \frac{2}{3}\begin{bmatrix} 1 & -\frac{1}{2} & -\frac{1}{2}\\ 0 & \frac{\sqrt{3}}{2} & \frac{-\sqrt{3}}{2} \end{bmatrix}
 $$
 
 Then, the transformed voltage vector is $\boldsymbol v_s = \pmb{\mathcal{T}}\boldsymbol v_{abc}$. Into the eight combinations of the new transformed voltage vectors we have two zero vectors (i.e., the voltage produced is zero), and six active vectors (i.e., the voltage produced is different than zero). The different voltage vectors can be visualized in the space vector diagram shown in Fig. 2. 
