@@ -21,7 +21,8 @@ toc:
     #   - name: Example Child Subsection 2
   - name: Introduction
   - name: Two-Level Voltage Source Converter
-
+  - name: Finite Control Set MPC
+  - name: Simulation Results
 
 
 ---
@@ -51,6 +52,10 @@ In early implementations of FCS-MPC, the controller **evaluated all possible swi
 
 Don’t worry if this sounds abstract — this is just a high-level summary. In the sections that follow, we’ll break down the core ideas and walk through the basic implementation of an FCS-MPC algorithm.
 
+This post is based on the paper:
+
+*J. Rodriguez _et al_., "Predictive Current Control of a Voltage Source Inverter," in _IEEE Transactions on Industrial Electronics_, vol. 54, no. 1, pp. 495-503, Feb. 2007, doi: 10.1109/TIE.2006.888802.*
+
 # Two-Level Voltage Source Converter
 
 The 2L-VSC is the most basic inverter topology that every power electronics student learns. It consist of three legs with two switches each. The switches have two modes of operation: the *on* state and the *off* state. During the *on* state, the switch is conducting. Meanwhile, during the *off* state, the switch is blocking. To avoid the shoot-through state (which is when the two switches of one leg are in the *on* state, short-circuiting the DC-link bus), the switches operate in a complementary manner (i.e., when one switch is in the *on* state, the other is in the *off* state). The diagram of the 2L-VSC is shown in Fig. 1.  
@@ -68,3 +73,107 @@ $$\mathbb U \triangleq \left\{\begin{bmatrix}0\\0\\0\end{bmatrix},\begin{bmatrix
 Until now, we have just characterized the operation of the converter. However, we are interested in the converter output voltage. Consider that an ideal *dc* voltage source is connected at the *dc* side of the converter. The *ac* side output voltage is then:
 
 $$\boldsymbol v_{abc} = V_{dc}\boldsymbol u_{abc}$$
+
+It is typical to transform this three-phase voltage into a two-phase voltage using the *Amplitude-invariant Clarke transform*. To do so we define the transformation as follows:
+
+$$
+\pmb{\mathcal{T}} = \frac{2}{3}\begin{bmatrix} 1 & {-}\frac{1}{2} & {-}\frac{1}{2}\\ 0 & \frac{\sqrt{3}}{2} & \frac{{-}\sqrt{3}}{2} \end{bmatrix}
+$$
+
+Then, the transformed voltage vector is $\boldsymbol v_s = \pmb{\mathcal{T}}\boldsymbol v_{abc}$. Into the eight combinations of the new transformed voltage vectors we have two zero vectors (i.e., the voltage produced is zero), and six active vectors (i.e., the voltage produced is different than zero). The different voltage vectors can be visualized in the space vector diagram shown in Fig. 2. 
+
+<div class="row justify-content-sm-center">
+  <div class="col-sm-8 mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img/img_bp0/SV_diagram_2LVSC.svg" title="Fig. 2 Space Vector diagram of the 2L-VSC" caption="Fig. 2 Space Vector Diagram of the 2L-VSC" class="img-fluid rounded z-depth-1" %}
+  </div>
+</div>
+
+This is it for the modelling of the converter, lets go now to the control algorithm.
+
+# Finite Control Set MPC
+
+The idea behind FCS-MPC is simple. Predict the evolution of the load variables subjected to each switching vector of the converter, and choose the one which produce the best result based on some criteria. Until now we have not discussed the load, and we will keep it that way for now. It will be introduced briefly.  
+
+Consider the following optimization problem:
+$$
+\begin{aligned}
+	\underset{\boldsymbol u_s \in \pmb{\mathcal{T}}\mathbb U}{\operatorname*{arg\,min}} \quad & J(\boldsymbol u_s)
+\end{aligned}
+$$
+
+We will be considering this simple problem for now. If you are not familiarized with this notation, it can seem a little bit daunting. Lets break it down:
+1. $\boldsymbol u_s$ is the optimization variable. It is the input to the problem, and its also what we can manipulate ($\boldsymbol u_s$ is the transformed three-phase switching vector $\boldsymbol u_s = \pmb{\mathcal{T}}\boldsymbol u_{abc}$).
+2. We have a new set $\mathbb V \triangleq \pmb{\mathcal{T}}\mathbb U$. This set contains the elements of set $\mathbb U$ multiplied by the transformation matrix $\pmb{\mathcal{T}}$. 
+3. $J(\boldsymbol u_s)$ is the cost function. It defines the measure of how wrong or far off a solution is from what we want. 
+4. Third we have ${\operatorname*{arg\,min}}$. This means that the output of the problem is the element of $\mathbb V$, $\boldsymbol u_s^\star$, which minimizes the cost function $J$.
+
+Here we aren't considering constraints, they will be studied in future posts. To consider this example, we will now consider the load and it will be in this case a simple resistive-inductive (*R-L*) load. It consist of the series connection of a resistance and an inductor. We will not go into the details of the load modelling, as it will be assumed known knowledge. The dynamics of the load currents are defined by the following differential equation:
+
+$$
+\frac{\boldsymbol di_s}{dt} = -\frac{R}{L}\boldsymbol i_s + \underbrace{\frac{V_{dc}}{L}\boldsymbol u_s}_{\frac{1}{L}\boldsymbol v_s} 
+$$
+
+Where $\boldsymbol i_s = [i_{s\alpha}\;i_{s\beta}]^\intercal \in \mathbb R^2$ is the load current, *R* is the load resistance, *L* is the load inductance, and $V_{dc}$ is the *dc*-link voltage. The algorithm requires a discretization of this differential equation. For this there are several methods, however, we will just consider *Forward Euler*:
+
+$$
+\frac{d\boldsymbol x(t)}{dt} \approx \frac{\boldsymbol x_{k+1}-\boldsymbol x_k}{T_s}
+$$
+
+Where $T_s$ is the step size or sampling interval. Applying this into the dynamics of the load current we obtain:
+
+$$
+\boldsymbol i_{s,k+1} = \left(1-\frac{R}{L}T_s\right)\boldsymbol i_{s,k} + \frac{V_{dc}}{L}T_s\boldsymbol u_{sj,k} 
+$$
+
+Notice that now we have $\boldsymbol u_{sj,k}$. ¿What does *j* stands for there?. Well, ¿remember that the set $\mathbb U$ has eight elements (and by extension, so does set $\mathbb V$)?. Variable *j* is just the index of the elements of the set. Thus, $j\in \{0,\ldots,7\}$ (indexing from 0). 
+¿What should be the objective of our algorithm? There could be several, depending on the specific application. To keep it simple, we will just make the load current follow a given time-variable reference. To comply with this objective, our cost function is the following:
+
+$$
+J = \lVert \boldsymbol i_{s,k+1} - \boldsymbol i_{s,k+1}^{ref}\rVert_2^2
+$$
+
+Again, lets break this down. $\lVert \star \rVert_2^2$ is just the $\ell_2$-norm. To define it, consider the *n*-dimensional vector $\boldsymbol \zeta = \begin{bmatrix} \zeta_1 & \ldots & \zeta_n \end{bmatrix}$. The $\ell_2$-norm is defined as $\lVert \boldsymbol \zeta \rVert_2^2 = \zeta_1^2 + \ldots + \zeta_n^2 = \boldsymbol \zeta^\intercal \boldsymbol \zeta$. For the specific case we are seeing, this would translate to:
+
+$$
+J = \left(i_{s\alpha,k+1} - i_{s\alpha,k+1}^{ref} \right)^2 + \left(i_{s\beta,k+1} - i_{s\beta,k+1}^{ref} \right)^2 
+$$
+
+There is a discussion about the choice of norm in the literature, we will talk a bit about in the future. The discussion is already settled by the results obtain to this date, so it will be just an informative post. Lets rewrite the cost function in terms of $\boldsymbol u_s$ replacing the dynamics of $\boldsymbol i_{s,k+1}$ into the cost function. We obtain:
+
+$$
+J(\boldsymbol u_{sj}) = \lVert \boldsymbol u_{sj} - \boldsymbol u_{db}\rVert_2^2
+$$
+
+Where $\boldsymbol u_{db}$ is the control action required to reach $\boldsymbol i_{s,k+1}$ from $\boldsymbol i_{s,k}$ in one time-step. It is defined as follows:
+
+$$
+\boldsymbol u_{db} = \frac{L}{V_{dc}T_s}\left[\boldsymbol i_{s,k+1}^{ref} - \left(1-\frac{R}{L}T_s \right)\boldsymbol i_{s,k}\right]
+$$
+
+To obtain it, just make $\boldsymbol i_{s,k+1}=\boldsymbol i_{s,k+1}^{ref}$ in the prediction equation of the load current, and solve for $\boldsymbol u_{sj,k}$. Finally, a simple flowchart implementation of the FCS-MPC discussed can be seen in Fig. 3.
+
+<div class="row justify-content-sm-center">
+  <div class="col-sm-8 mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img/img_bp0/FCSMPC_FC.svg" title="Fig. 3 Flow Chart of FCS-MPC Algorithm" caption="Fig. 3 Flow Chart of the FCS-MPC algorithm" class="img-fluid rounded z-depth-1" %}
+  </div>
+</div>
+
+This flowchart is adapted from the one presented in <d-cite key="rodriguez_state_2013"></d-cite>. 
+
+# Simulation results
+
+The parameters for the load are $R = 0.5\; \Omega$, $L = 10\;mH$, $V_{dc} = 100\;V$ and the sampling frequency 10 kHz. The results with a sinusoidal reference signal are shown in Fig. 4.
+
+<div class="row justify-content-sm-center">
+  <div class="col-sm-8 mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img/img_bp0/Sinusoidal.png" title="Fig. 4 Simulation results with sinusoidal reference" caption="Fig. 4 Simulation results with sinusoidal reference" class="img-fluid rounded z-depth-1" %}
+  </div>
+</div>
+
+Meanwhile the results with a triangular reference signal are shown in Fig. 5.
+
+<div class="row justify-content-sm-center">
+  <div class="col-sm-8 mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img/img_bp0/Triangular.png" title="Fig. 5 Simulation results with triangular reference" caption="Fig. 5 Simulation results with triangular reference" class="img-fluid rounded z-depth-1" %}
+  </div>
+</div>
