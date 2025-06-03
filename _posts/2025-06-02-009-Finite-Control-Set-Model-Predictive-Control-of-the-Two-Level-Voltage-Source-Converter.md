@@ -1,6 +1,6 @@
 ---
 layout: distill
-title: Finite Control Set Model Predictive Control of a Two Level Voltage Source Converter
+title: Current Control of a Two Level Voltage Source Converter with Finite Control Set MPC
 
 authors:
   - name: Felipe Herrera
