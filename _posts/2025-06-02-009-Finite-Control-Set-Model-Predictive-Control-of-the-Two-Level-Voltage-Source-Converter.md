@@ -97,6 +97,7 @@ This is it for the modelling of the converter, lets go now to the control algori
 The idea behind FCS-MPC is simple. Predict the evolution of the load variables subjected to each switching vector of the converter, and choose the one which produce the best result based on some criteria. Until now we have not discussed the load, and we will keep it that way for now. It will be introduced briefly.  
 
 Consider the following optimization problem:
+
 $$
 \begin{aligned}
 	\underset{\boldsymbol u_s \in \pmb{\mathcal{T}}\mathbb U}{\operatorname*{arg\,min}} \quad & J(\boldsymbol u_s)
