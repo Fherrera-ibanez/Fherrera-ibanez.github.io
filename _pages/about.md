@@ -24,7 +24,7 @@ latest_posts:
 
 Hey, thanks for stopping by! 👋
 
-I’m Felipe Herrera, a Ph.D. candidate in Electrical Engineering at the University of Chile, and soon to be pursuing a dual Ph.D. in Electrical and Electronics Engineering at the University of Nottingham (starting July 2025).
+I’m Felipe Herrera, a Ph.D. candidate in Electrical Engineering at the University of Chile.
 
 My research is focused on advanced control techniques for power electronics, particularly Model Predictive Control (MPC) applied to Multilevel Converters. I’m passionate about bridging theoretical insights with practical implementation to improve the performance, efficiency, and reliability of modern power electronic systems.
 
